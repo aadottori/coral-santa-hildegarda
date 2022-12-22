@@ -2,7 +2,8 @@ import streamlit as st
 import yaml
 from pymongo import MongoClient
 import pandas as pd
-
+import json
+import ast
 with open('./config.yaml') as file:
     config = yaml.load(file, Loader=yaml.SafeLoader)
 
@@ -14,59 +15,50 @@ db = client["coral"]
 
 st.set_page_config(page_title='CSH | Partituras')
 st.title("""Partituras do Coral""")
-
 st.text("Aqui encontramos todas as partituras!")
 
-musicas = db.musicas.find({})
-j = {}
-for x in musicas:
-    j[str(x["_id"])] = x
 
+#Query no Mongo
+musicas_mongo = db.musicas.find({})
+j = {}
+for x in musicas_mongo:
+    j[str(x["_id"])] = x
 df = pd.DataFrame.from_dict(j, orient="index")
-df
+
+
+
+#FILTROS
+st.subheader("Filtros")
 
 selecao_titulo = st.multiselect(
     "Filtrar por título", options=df["Nome"].unique(), default=None
     )
 
-tipos = df["Tipos"]
+df["Tipos"] = df["Tipos"].apply(lambda x: ast.literal_eval(x) if type(x)==str else x)
+tipos = list(set([x for y in [a for a in list(df["Tipos"]) for b in a] for x in y]))
 
 selecao_tipo = st.multiselect(
     "Filtrar por tipo", options=tipos, default=None
     )
 
-# st.subheader("Partituras")
+#PARTITURAS
+st.subheader("Partituras")
 
-# if selecao_titulo == [] and selecao_tipo == []:
-#     musicas
-# elif selecao_titulo != [] and selecao_tipo == []:
-#     musicas_filtradas_por_nome = {}
-#     for x in musicas[0]:
-#         if x in selecao_titulo:
-#             musicas_filtradas_por_nome[x] = musicas[0][x]
-#     [musicas_filtradas_por_nome]
+if selecao_titulo == [] and selecao_tipo == []:
+    df
 
-# elif selecao_titulo == [] and selecao_tipo != []:
-#     musicas_filtradas_por_tipo = {}
-#     for x in musicas[0]:
-#         tipos_musica = musicas[0][x]["Tipo"]
-#         if any(tipo in tipos_musica for tipo in selecao_tipo):
-#             musicas_filtradas_por_tipo[x] = musicas[0][x]
-#     [musicas_filtradas_por_tipo]
+elif selecao_titulo != [] and selecao_tipo == []:
+    df[df["Nome"].isin(selecao_titulo)]
 
-# else:
-#     musicas_filtradas_por_nome = {}
-#     for x in musicas[0]:
-#         if x in selecao_titulo:
-#             musicas_filtradas_por_nome[x] = musicas[0][x]
-#     musicas_filtradas_por_nome = [musicas_filtradas_por_nome]
-    
-#     musicas_filtradas_por_nome_e_tipo = {}
-#     for x in musicas_filtradas_por_nome[0]:
-#         tipos_musica = musicas_filtradas_por_nome[0][x]["Tipo"]
-#         if any(tipo in tipos_musica for tipo in selecao_tipo):
-#             musicas_filtradas_por_nome_e_tipo[x] = musicas_filtradas_por_nome[0][x]
-#     [musicas_filtradas_por_nome_e_tipo]
+elif selecao_titulo == [] and selecao_tipo != []:
+    df["Check"] = df["Tipos"].apply(lambda r: any(i in r for i in selecao_tipo))
+    df = df[df["Check"]==True]
+    df = df[df.columns[0:len(df.columns)-1]]
+    df
 
-
-
+else:
+    df["Check"] = df["Tipos"].apply(lambda r: any(i in r for i in selecao_tipo))
+    df = df[df["Check"]==True]
+    df = df[df.columns[0:len(df.columns)-1]]
+    df = df[df["Nome"].isin(selecao_titulo)]
+    df
