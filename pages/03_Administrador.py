@@ -10,7 +10,7 @@ st.set_page_config(page_title='CSH | Administrador')
 with open('./config.yaml') as file:
     config = yaml.load(file, Loader=yaml.SafeLoader)
 
-client = MongoClient("mongodb+srv://coral:Vq6Xv9Y6X8CtxEP2@coral.fnddefl.mongodb.net/?retryWrites=true&w=majority")
+client = MongoClient(f'mongodb+srv://{config["database"]["username"]}:{config["database"]["password"]}@coral.fnddefl.mongodb.net/?retryWrites=true&w=majority')
 db = client["coral"]
 
 authenticator = stauth.Authenticate(

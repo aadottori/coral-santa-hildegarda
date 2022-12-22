@@ -8,7 +8,7 @@ with open('./config.yaml') as file:
 
 
 
-client = MongoClient("mongodb+srv://coral:Vq6Xv9Y6X8CtxEP2@coral.fnddefl.mongodb.net/?retryWrites=true&w=majority")
+client = MongoClient(f'mongodb+srv://{config["database"]["username"]}:{config["database"]["password"]}@coral.fnddefl.mongodb.net/?retryWrites=true&w=majority')
 db = client["coral"]
 
 
@@ -18,18 +18,22 @@ st.title("""Partituras do Coral""")
 st.text("Aqui encontramos todas as partituras!")
 
 musicas = db.musicas.find({})
-# accounts = list(df.account_name.unique())
-st.subheader("Filtros")
+j = {}
+for x in musicas:
+    j[str(x["_id"])] = x
 
+df = pd.DataFrame.from_dict(j, orient="index")
+df
 
-# selecao_titulo = st.multiselect(
-#     "Filtrar por título", options=musicas[0].keys(), default=None
-#     )
+selecao_titulo = st.multiselect(
+    "Filtrar por título", options=df["Nome"].unique(), default=None
+    )
 
-# tipos = list(set([a for b in [musicas[0][x]["Tipo"] for x in musicas[0]] for a in b]))
-# selecao_tipo = st.multiselect(
-#     "Filtrar por tipo", options=tipos, default=None
-#     )
+tipos = df["Tipos"]
+
+selecao_tipo = st.multiselect(
+    "Filtrar por tipo", options=tipos, default=None
+    )
 
 # st.subheader("Partituras")
 
@@ -65,10 +69,4 @@ st.subheader("Filtros")
 #     [musicas_filtradas_por_nome_e_tipo]
 
 
-j = {}
-for x in musicas:
-    j[str(x["_id"])] = x
 
-colunas_desejadas = ["Nome", "Tipos", "Criação"]
-df = pd.DataFrame.from_dict(j, orient="index", columns=colunas_desejadas)
-df
