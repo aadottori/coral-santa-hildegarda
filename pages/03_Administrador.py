@@ -27,10 +27,6 @@ authenticator = stauth.Authenticate(
 
 name, authentication_status, username = authenticator.login('Login', 'main')
 
-# def salvar_arquivo(arquivo):
-#     with open(arquivo.name, "w") as f:
-#          f.write(arquivo).getbuffer()
-
 
 tags_mongo = db.tags.find({})
 j = {}

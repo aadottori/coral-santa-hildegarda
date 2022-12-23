@@ -1,4 +1,6 @@
+boto3==1.26.36
 pandas==1.5.2
+pdfplumber==0.7.6
 pymongo==4.3.3
 PyYAML==6.0
 streamlit==1.16.0
