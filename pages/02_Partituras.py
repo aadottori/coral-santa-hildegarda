@@ -31,34 +31,34 @@ df = pd.DataFrame.from_dict(j, orient="index")
 st.subheader("Filtros")
 
 selecao_titulo = st.multiselect(
-    "Filtrar por título", options=df["Nome"].unique(), default=None
+    "Filtrar por título", options=df["name"].unique(), default=None
     )
 
-df["Tipos"] = df["Tipos"].apply(lambda x: ast.literal_eval(x) if type(x)==str else x)
-tipos = list(set([x for y in [a for a in list(df["Tipos"]) for b in a] for x in y]))
+df["tag"] = df["tag"].apply(lambda x: ast.literal_eval(x) if type(x)==str else x)
+tags = list(set([x for y in [a for a in list(df["tag"]) for b in a] for x in y]))
 
-selecao_tipo = st.multiselect(
-    "Filtrar por tipo", options=tipos, default=None
+selecao_tag = st.multiselect(
+    "Filtrar por tag", options=tags, default=None
     )
 
 #PARTITURAS
 st.subheader("Partituras")
 
-if selecao_titulo == [] and selecao_tipo == []:
+if selecao_titulo == [] and selecao_tag == []:
     df
 
-elif selecao_titulo != [] and selecao_tipo == []:
-    df[df["Nome"].isin(selecao_titulo)]
+elif selecao_titulo != [] and selecao_tag == []:
+    df[df["name"].isin(selecao_titulo)]
 
-elif selecao_titulo == [] and selecao_tipo != []:
-    df["Check"] = df["Tipos"].apply(lambda r: any(i in r for i in selecao_tipo))
+elif selecao_titulo == [] and selecao_tag != []:
+    df["Check"] = df["tag"].apply(lambda r: any(i in r for i in selecao_tag))
     df = df[df["Check"]==True]
     df = df[df.columns[0:len(df.columns)-1]]
     df
 
 else:
-    df["Check"] = df["Tipos"].apply(lambda r: any(i in r for i in selecao_tipo))
+    df["Check"] = df["tag"].apply(lambda r: any(i in r for i in selecao_tag))
     df = df[df["Check"]==True]
     df = df[df.columns[0:len(df.columns)-1]]
-    df = df[df["Nome"].isin(selecao_titulo)]
+    df = df[df["name"].isin(selecao_titulo)]
     df
