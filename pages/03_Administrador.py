@@ -72,7 +72,7 @@ if st.session_state["authentication_status"]:
 
         nome = st.text_input("Nome")
         tags = st.multiselect("Tags", options=opcoes_tags, default=None)
-        code = str(uuid.uuid4())
+
 
         uploaded_file = st.file_uploader("Selecione um arquivo")
         if uploaded_file is not None:
@@ -80,7 +80,7 @@ if st.session_state["authentication_status"]:
                 st.error('Só são permitidos arquivos PDF.')
             else:
                 bytes_data = uploaded_file.getvalue()
-
+        code = str(uuid.uuid4())
         musica = {
             "name": nome,
             "tag": tags,
@@ -93,6 +93,7 @@ if st.session_state["authentication_status"]:
         musica_criada = st.button("Salvar", on_click=salvar_musica, args=(musica,))
         if musica_criada:
             with st.spinner('Carregando...'):
+                salvar_musica(musica)
                 upload_file_to_S3(uploaded_file, f'{config["s3"]["bucket"]}', f'partituras/{code}_{nome.replace(" ", "_")}.pdf')
             st.success('Música inserida!', icon="✅")
 

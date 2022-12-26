@@ -23,16 +23,6 @@ def get_s3():
     s3 = boto3.resource('s3', aws_access_key_id=config["s3"]["AWS_ACCESS_KEY_ID"], aws_secret_access_key=config["s3"]["AWS_SECRET_ACCESS_KEY"])  
     return s3
 
-def get_file(s3_filename):
-    s3 = get_s3()
-    obj = s3.Object(config["s3"]["bucket"], s3_filename)
-    file = obj.get()['Body'].read()
-    with open(f"{s3_filename}.pdf", "w") as f:
-        f.write(file)
-
-
-def save_file(s3_filename):
-    file = get_file(s3_filename)
 
 
 st.set_page_config(page_title='CSH | Partituras')
@@ -49,6 +39,16 @@ df_from_j = pd.DataFrame.from_dict(j, orient="index")
 df = df_from_j.copy()
 df = df[["name", "tag", "code", "creation_date"]] 
 # df["Download"] = st.download_button("Baixar", 
+
+
+def preparar_arquivo(nome_musica):
+    codigo = list(df[df["name"]==nome_musica]["code"])[0]
+    s3_filename = f'partituras/{codigo}_{nome_musica.replace(" ", "_")}.pdf'
+    s3 = get_s3()
+    obj = s3.Object(config["s3"]["bucket"], s3_filename)
+    file = obj.get()['Body'].read()
+    with open(f"./{nome_musica}.pdf", "wb") as f:
+        f.write(file) 
 
 
 #FILTROS
@@ -114,8 +114,14 @@ else:
     selected = make_aggrid(df)
 
 
-# if selected:
-#     s3f="partituras/7063bbfe-54bb-489f-a8b8-3a336f488fbc_Adeste_Fideles.pdf"
-#     get_file(s3f)
-#     st.download_button("Download",
-#                         data=f"{s3f}.pdf")
+
+
+st.subheader("Download")
+filtro_download = st.multiselect("Filtrar por título", options=df["name"].unique(), default=None, max_selections=1)
+if filtro_download:
+    nome_musica = filtro_download[0]
+    preparar = st.button("Preparar", on_click = preparar_arquivo(nome_musica))
+
+    if preparar:
+        with open(f"./{nome_musica}.pdf", "rb") as f:
+            download = st.download_button("Download", f, file_name=f'{nome_musica}.pdf', mime='application/pdf')
