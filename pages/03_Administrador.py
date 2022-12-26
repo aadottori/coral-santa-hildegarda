@@ -55,11 +55,15 @@ def criar_tag(tag):
         tag_criado = tags.insert_one(tag)
         return tag_criado.inserted_id
 
+def salvar_musica_no_banco(musica):
+
+    return musica_criada
+
 def salvar_musica(musica):
     musicas = db.musicas
     musica_criada = musicas.insert_one(musica)
+    upload_file_to_S3(uploaded_file, f'{config["s3"]["bucket"]}', f'partituras/{musica["code"]}_{musica["name"].replace(" ", "_")}.pdf')
     return musica_criada.inserted_id
-
 
 if st.session_state["authentication_status"]:
     st.write(f'Bem vindo(a), *{st.session_state["name"]}*')
@@ -90,11 +94,10 @@ if st.session_state["authentication_status"]:
         }
 
 
-        musica_criada = st.button("Salvar", on_click=salvar_musica, args=(musica,))
+        musica_criada = st.button("Salvar")
         if musica_criada:
             with st.spinner('Carregando...'):
                 salvar_musica(musica)
-                upload_file_to_S3(uploaded_file, f'{config["s3"]["bucket"]}', f'partituras/{code}_{nome.replace(" ", "_")}.pdf')
             st.success('Música inserida!', icon="✅")
 
 

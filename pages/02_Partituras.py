@@ -5,8 +5,6 @@ import pandas as pd
 import boto3
 import json
 import ast
-import pdfplumber
-from io import BytesIO
 from st_aggrid import GridOptionsBuilder, AgGrid, GridUpdateMode, DataReturnMode
 
 with open('./config.yaml') as file:
