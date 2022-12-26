@@ -105,8 +105,16 @@ if st.session_state["authentication_status"]:
 
     with st.expander("Criar tags"):
         f'Tags disponíveis: **{", ".join(list(df["tag"]))}**.'
-        novo_tag = st.text_input("Nova tag")
-        tag_criado = st.button("Criar", on_click=criar_tag, args=({"tag": novo_tag},))
+
+        with st.form("tags", clear_on_submit=True):
+            novo_tag = st.text_input("Nova tag")
+
+            tag_criada = st.form_submit_button("Criar")
+            if tag_criada:
+                criar_tag({"tag": novo_tag})
+                st.experimental_rerun()
+
+
 
 
     authenticator.logout('Sair', 'main')
