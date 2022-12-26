@@ -6,8 +6,8 @@ st.set_page_config(page_title='Coral Santa Hildegarda')
 st.title("""Coral Santa Hildegarda""")
 
 st.markdown("""
-"Oh, Pastor das almas, e, oh, Primeira Palavra,
-pela qual temos sido todos criados! \n
+"Ó, Pastor das Almas, e ó, Primeira Palavra,
+pela qual fomos todos criados! \n
 Consente, consente agora em livrar-nos
 de nossas misérias e nossa languidez!"
 """)
